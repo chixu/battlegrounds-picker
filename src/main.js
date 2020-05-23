@@ -71,7 +71,7 @@ function getLang() {
 
 let teirInfo = {
     1: {
-        eachCardsCount: 18,
+        eachCardsCount: 16,
         cardsChosen: 3
     },
     2: {
@@ -91,7 +91,7 @@ let teirInfo = {
         cardsChosen: 5
     },
     6: {
-        eachCardsCount: 6,
+        eachCardsCount: 7,
         cardsChosen: 6
     },
 }

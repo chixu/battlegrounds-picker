@@ -77,9 +77,8 @@ function others() {
   fs.copyFileSync("python/cards_150.png", "dist/cards_150.png")
   fs.copyFileSync("python/cards_150_cn.json", "dist/cards_150_cn.json")
   fs.copyFileSync("python/cards_150_cn.png", "dist/cards_150_cn.png")
-  fs.copyFileSync("src/strategy.json", "dist/strategy.json")
   fs.copyFileSync("src/icon.ico", "dist/icon.ico")
-  return gulp.src(['src/data.json'])
+  return gulp.src(['src/strategy.json'])
     .pipe(gulp.dest('dist'));
 }
 

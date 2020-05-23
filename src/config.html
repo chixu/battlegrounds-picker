@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/jquery-ui.css">
+    <link rel="icon" href="./icon.ico">
+    <script src="./lib/jquery-3.3.1.min.js"></script>
+    <script src="./lib/jquery-ui.min.js"></script>
+    <script src="./lib/bootstrap.min.js"></script>
+    <script src="./lib/Draggable.min.js"></script>
+    <script src="./lib/TweenMax.min.js"></script>
+    <style>
+        .btn-outline-primary:hover {
+            background-color: transparent;
+            color: #007bff;
+        }
+
+        #header {
+            /* padding: 5px; */
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #createHeader {
+            /* padding: 5px; */
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #createHeader input {
+            font-size: 16px
+        }
+
+        .hscard {
+            position: relative;
+        }
+
+        .hscard button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 1px 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .mycard {
+            width: 150px;
+            height: 207px;
+        }
+    </style>
+    <title>炉石酒馆</title>
+</head>
+
+<body>
+    <div id="header" class="p-2">
+        <div id="strategies"></div>
+        <div class="justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="onSaveClick()">Save</button>
+            <button type="button" class="btn btn-danger" onclick="onDeleteClick()">Delete</button>
+            <button type="button" id="save" class="btn btn-success" onclick="onCreateClick()">Create</button>
+        </div>
+    </div>
+    <div id="createHeader" class="p-2" style="display: none">
+        <input id="strategyName" placeholder="Name">
+        <div class="justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="onNewSaveClick()">Save</button>
+            <button type="button" id="save" class="btn btn-danger" onclick="onCloseClick()">Close</button>
+        </div>
+    </div>
+    <div id="main"></div>
+</body>
+<script src="drag.js"></script>
+<script src="config.js"></script>
+
+</html>

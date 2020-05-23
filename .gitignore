@@ -1,0 +1,7 @@
+node_modules
+dist
+python/*
+src/back/
+!python/data.json
+!python/data_cn.py
+!python/main.py

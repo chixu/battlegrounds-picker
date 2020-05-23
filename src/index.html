@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link rel="stylesheet" href="./css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="./css/materialize.min.css">
+    <link rel="icon" href="./icon.ico">
+    <script src="./lib/jquery-3.3.1.min.js"></script>
+    <script src="./lib/bootstrap.min.js"></script>
+    <style>
+        [type="radio"]:checked+span:after,
+        [type="radio"].with-gap:checked+span:before,
+        [type="radio"].with-gap:checked+span:after {
+            border: 2px solid #2196f3;
+        }
+
+        [type="radio"]:checked+span:after,
+        [type="radio"].with-gap:checked+span:after {
+            background-color: #2196f3;
+        }
+
+        .checkbox-blue[type="checkbox"].filled-in:checked+span:not(.lever):after {
+            border: 2px solid #2196f3;
+            background-color: #2196f3;
+        }
+
+        .d-inline-block {
+            display: inline-block !important;
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .mycard {
+            width: 150px;
+            height: 207px;
+        }
+
+        .topHeader {
+            margin-top: 10px;
+            display: flex;
+        }
+
+        #header3 {
+            display: flex;
+            flex-wrap: wrap;
+            /* flex-grow: 1;
+            flex-shrink: 1; */
+            width: calc(100% - 100px);
+        }
+
+        .header-title {
+            width: 100px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .header {
+            padding: 5px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            /* margin-bottom: 5px; */
+        }
+
+        .filter {
+            margin-left: 10px;
+        }
+
+        .filter-checked span {
+            color: #2196f3
+        }
+
+        .filter span {
+            display: inline-block;
+            padding-left: 25px !important;
+            text-align: right;
+            font-size: 18px;
+        }
+
+        h4 {
+            margin-left: 20px;
+        }
+
+        h4 span {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        hr {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .spacer {
+            flex: 1 1 auto;
+        }
+
+        .tier-content {
+            display: flex;
+            align-items: center;
+            flex: 1 1 auto;
+        }
+
+        /* 
+        .tier-text {
+            margin-top: -5px;
+        } */
+        .tier-header {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+        }
+
+        .tier-header-1 {
+            margin-left: 10px;
+            font-size: 30px;
+        }
+
+        .tier-header-2 {
+            margin: 0px 10px 5px 20px;
+            font-size: 20px;
+        }
+
+        .tooltip {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            color: #fff;
+            background-color: #2196f3;
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 0px 0px 1px 7px;
+            font-size: 13px;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #2196f3;
+            color: #fff;
+            text-align: left;
+            font-size: 14px;
+
+            border-radius: 6px;
+            padding: 10px;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+            top: -5px;
+            left: 120%;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+    </style>
+    <title>炉石酒馆</title>
+</head>
+
+<body>
+    <div class="header topHeader">
+        <div class="header-title" id="title_tier">Tier: </div>
+        <div class="tier-content">
+            <div id="tiers"></div>
+            <div class="spacer"></div>
+            <div class="justify-content-end">
+                <!-- <button type="button" class="btn btn-primary" onclick="onConfigClick()">Edit</button> -->
+                <button id="change-lang" type="button" class="btn blue" onclick="onLangClick()">Edit</button>
+                <!-- <button type="button" id="save" class="btn btn-primary d-none" onclick="onSaveClick()">Save</button> -->
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="header">
+        <div class="header-title" id="title_miniontype">Minion Type: </div>
+        <div id="header2"></div>
+    </div>
+    <hr>
+    <div class="header">
+        <div class="header-title" id="title_keyword">Keyword: </div>
+        <div id="header3"></div>
+    </div>
+    <hr>
+    <div class="header">
+        <div class="header-title" id="title_strategy">Strategy: </div>
+        <div id="strategies"></div>
+    </div>
+    <hr>
+    <div id="main"></div>
+</body>
+<!-- <script src="drag.js"></script> -->
+{{{publishscript}}}
+
+<script src="main.js?v={{{publishtime}}}"></script>
+
+</html>

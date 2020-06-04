@@ -2,7 +2,7 @@
 
 HearthStone Battlegrounds Card Picker helps you to make better decision for card picking during HearthStone Battlegrounds
 ![Screenshot](docs/hsbgss0.jpg)
-## [Live Demo](http://www.chixu.info/p/hsbg/)
+## [Live Demo](http://www.chixu.info/hsbg/)
 
 ## Features
 - Fast loading (compressed card images)

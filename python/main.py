@@ -38,6 +38,7 @@ header = {
 download_info = {}
 cards = {}
 cards_trim = {}
+cards_count = 0
 
 types = {
     '0': 'Normal',
@@ -46,6 +47,7 @@ types = {
     '17': 'Mech',
     '14': 'Murloc',
     '24': 'Dragon',
+    '23': 'Pirate',
     '26': 'All'
 }
 
@@ -108,7 +110,8 @@ def downloadCards(lang=""):
 
 
 def merge_image(lang=""):
-    count = 92
+    global cards_count
+    count = cards_count
     col_max = 10
     global cards_trim
     rows = math.ceil(count / col_max)
@@ -158,7 +161,7 @@ def save_json(file_name, obj):
 
 
 def minify_image(lang):
-    basewidth = 150
+    basewidth = 130
     for c in cards:
         # name = c['name']
         id = c['id']
@@ -203,10 +206,12 @@ def create_directory(lang=""):
 def run(lang=""):
     global cards
     global cards_trim
+    global cards_count
     global download_info
     f = open("data" + lang + ".json", "r", encoding='UTF-8')
     obj = json.loads(f.read())
     cards = obj['cards']
+    cards_count = obj['cardCount']
     cards_trim = {}
 
     today = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d')

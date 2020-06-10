@@ -12,7 +12,8 @@ let typesCount = {
     'Beast': 0,
     'Dragon': 0,
     'Mech': 0,
-    'Murloc': 0
+    'Murloc': 0,
+    'Pirate': 0
 };
 let i18n = {
     title: ["Battlegrounds", "炉石酒馆"],
@@ -28,6 +29,7 @@ let i18n = {
     'Dragon': ["Dragon", "龙"],
     'Mech': ["Mech", "机械"],
     'Murloc': ["Murloc", "鱼人"],
+    'Pirate': ["Pirate", "海盜"],
     'Deathrattle': ["Deathrattle", "亡语"],
     'Battlecry': ["Battlecry", "战吼"],
     'Divine Shield': ["Divine Shield", "圣盾"],
@@ -111,6 +113,7 @@ let types = [
     ['24', 'Dragon'],
     ['17', 'Mech'],
     ['14', 'Murloc'],
+    ['23', 'Pirate'],
     // '100': '>100'
 ]
 let keywords = {
@@ -121,6 +124,7 @@ let keywords = {
     'Dragon': true,
     'Murloc': true,
     'Demon': true,
+    'Pirate': true,
     'Deathrattle': false,
     'Battlecry': false,
     'Divine Shield': false,
@@ -307,6 +311,7 @@ function onTypeChange() {
             shown = card.rank >= 100;
         } else if (t != 'All') {
             shown = card.type == t || card.type == 'All'
+            if(card.type == t)console.log(card, t);
         }
         // $(card.element).css('display', shown ? 'inline-block' : 'none');
         showCard(card, shown);

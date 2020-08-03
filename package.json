@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "gulp serve",
+    "dev": "gulp serve",
+    "publish": "gulp publish",
+    "build": "gulp build"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,5 @@
 let cards = [];
+let minionTypeData;
 let cardContainers = [];
 let typeContainers = [];
 let buttonTiers = [];
@@ -15,6 +16,9 @@ let typesCount = {
     'Murloc': 0,
     'Pirate': 0
 };
+const cardPool = {
+
+}
 let i18n = {
     title: ["Battlegrounds", "炉石酒馆"],
     tier: ["Tier", "等级"],
@@ -23,6 +27,7 @@ let i18n = {
     keyword: ["Keyword", "关键字"],
     strategy: ["Strategy", "策略"],
     'Normal': ["Normal", "普通"],
+    'Neutral': ["Neutral", "中立"],
     'Common': ["Common", "通用"],
     'Demon': ["Demon", "恶魔"],
     'Beast': ["Beast", "野兽"],
@@ -135,6 +140,7 @@ let keywords = {
 let main = document.getElementById('main')
 let header = document.getElementById('tiers')
 let header2 = document.getElementById('header2')
+let headerCardpool = document.getElementById('header_cardpool')
 let header3 = document.getElementById('header3')
 let strategyList = document.getElementById('strategies')
 let currentMinionType;
@@ -199,6 +205,28 @@ function renderHeader() {
         </label>
         `
     }
+
+    //init headerCardpool
+    for (let k in types) {
+        console.log(k);
+        let typename = types[k][1];
+        let count = typesCount['All'];
+        console.log(typename);
+        if (typename !== "All") {
+            count = cardPool[typename].ids.length;
+        }
+        let txt = translate(typename) + '(' + count + ')';
+        let id = "pool-" + typename;
+        headerCardpool.innerHTML += `
+        <label id="${id}" class="filter">
+            <input class="filled-in checkbox-blue" type="checkbox" checked value="${typename}" onchange="onPoolChange()" />
+            <span >${txt}</span>
+        </label>
+        `;
+    }
+    // checkCardPool(document.getElementById('pool-All'));
+    //end init headerCardpool
+
 
     for (let k in keywords) {
         let txt = translate(k) + (keysCount[k] ? ('(' + keysCount[k] + ')') : '')
@@ -302,6 +330,40 @@ function renderTiers() {
     }
 }
 
+function onPoolChange() {
+    let t = event.target.value;
+    let checked = event.target.checked;
+    if (t === "All") {
+        let allPools = document.getElementById("header_cardpool").children;
+        for (let i = 0; i < allPools.length; i++) {
+            let name = allPools[i].id.replace("pool-", "");
+            // let checked = allPools[i].children[0].checked;
+            if (name !== "pool-All")
+                allPools[i].children[0].checked = checked;
+        }
+    }
+    updateCardsByPool();
+    trackEvent("Pool", { name: t });
+}
+
+function updateCardsByPool() {
+    let allPools = document.getElementById("header_cardpool").children;
+    let showIds = []
+    for (let i = 0; i < allPools.length; i++) {
+        let name = allPools[i].id.replace("pool-", "");
+        let checked = allPools[i].children[0].checked;
+        if (checked && name !== "All")
+            showIds = showIds.concat(cardPool[name].ids);
+    }
+    showIds = showIds.map(v => v + "");
+    for (let k in cards) {
+        let card = cards[k];
+        // console.log(card.fullname);
+        card.inPool = showIds.indexOf(card.fullname) > -1
+        showCard(card);
+    }
+}
+
 function onTypeChange() {
     let t = event.target.value;
     for (let k in cards) {
@@ -311,10 +373,11 @@ function onTypeChange() {
             shown = card.rank >= 100;
         } else if (t != 'All') {
             shown = card.type == t || card.type == 'All'
-            if(card.type == t)console.log(card, t);
+            // if (card.type == t) console.log(card, t);
         }
         // $(card.element).css('display', shown ? 'inline-block' : 'none');
-        showCard(card, shown);
+        card.shown = shown;
+        showCard(card);
     }
     trackEvent("Minion", { name: t });
     checkMinionType(document.getElementById('type-' + t));
@@ -335,8 +398,10 @@ function onTypeChange() {
 //     }
 // }
 
-function showCard(card, b) {
-    if (b) {
+function showCard(card) {
+    // console.log("showCard", card, show, important)
+    show = card.inPool && card.shown;
+    if (show) {
         $(card.element).removeClass('d-none');
         $(card.element).addClass('d-inline-block');
     } else {
@@ -351,7 +416,8 @@ function onKeywordChange() {
         let card = cards[k];
         let shown = hasKey(card, key);
         // $(card.element).css('display', shown ? 'inline-block' : 'none');
-        showCard(card, shown);
+        card.shown = shown;
+        showCard(card);
     }
     trackEvent("Keyword", { name: key });
     checkKeyword(document.getElementById('keyword-' + key));
@@ -476,7 +542,8 @@ function onStrategyChange() {
             let card = cards[k];
             let name = card.fullname;
             card.rank = rank[name] || 0;
-            showCard(card, card.rank > -1);
+            card.shown = card.rank > -1
+            showCard(card);
             // $(card.element).css('display', card.rank > -1 ? 'inline-block' : 'none');
         }
         sortCard();
@@ -521,71 +588,98 @@ function getRank() {
     });
 }
 
-$.getJSON(`cards_150${lang == "zh" ? '_cn' : ''}.json?v=20200523`, function (data) {
-    // let data = JSON.parse(r);
-    console.log(data);
-    for (let k in data) {
-        let c = data[k];
-        let name = c['name']
-        let tier = c['tier']
-        let typeName = c['typeName']
-        // let fullname = tier + '_' + typeName + '_' + name;
-        let fullname = k;
-        let filename = fullname + '.png';
-        let desc = c.desc;
-        let pos = c.pos;
 
-        // let div = document.createElement('div');
-        let div = document.createElement('div');
-        // $(div).addClass('d-inline-block')
-        // let img = document.createElement('div')
-        div.className = "d-inline-block mycard";
-        // img.className = "mycard"
-        // img.id = fullname
-        // $(div).draggable();
-        // MyDrag.apply(div);
-        // img.src = './img_150/' + filename;
-        div.style = `display:block; background: url(cards_150${lang == "zh" ? '_cn' : ''}.png) -${pos[0]}px -${pos[1]}px;`
-        // div.appendChild(img);
-        // div.innerHTML += `
-        //     <input class="d-none" style="width:100px;margin:0 25px;text-align:center">
-        // `;
-        // cardContainers[tier - 1].appendChild(div);
-
-        let card = {
-            name: name,
-            tier: tier,
-            desc: desc,
-            type: typeName,
-            filename: filename,
-            fullname: fullname,
-            element: div,
-            rank: 0
-        }
-        cards.push(card)
-        if (tiersCount[tier])
-            tiersCount[tier]++;
-        else
-            tiersCount[tier] = 1
-
-        if (typeName == 'All') {
-            for (let k in typesCount) {
-                typesCount[k]++;
+$.getJSON(`cards_150${lang == "zh" ? '_cn' : ''}.json?v=${window.___publishtime}`, function (data) {
+    $.getJSON(`miniontype.json?v=${window.___publishtime}`, function (_minionTypData) {
+        // let data = JSON.parse(r);
+        // console.log(data);
+        minionTypeData = _minionTypData
+        for (let k in minionTypeData) {
+            let typeName = k;
+            if (typeName === "Neutral") typeName = "Normal";
+            let typeData = minionTypeData[k];
+            cardPool[typeName] = {
+                "ids": [],
+                "t1": 0,
+                "t2": 0,
+                "t3": 0,
+                "t4": 0,
+                "t5": 0,
+                "t6": 0
             }
-        } else {
-            typesCount[typeName]++;
-            typesCount['All']++;
-        }
-
-        for (let k in keywords) {
-            if (hasKey(card, k)) {
-                if (keysCount[k])
-                    keysCount[k]++;
-                else
-                    keysCount[k] = 1
+            for (let j = 0; j < typeData.length; j++) {
+                cardPool[typeName]["ids"].push(typeData[j].id);
+                cardPool[typeName]["t" + typeData[j].tier]++;
             }
         }
-        // console.log(name, tier, typeName)
-    }
-    getStrategy();
+        console.log("cardPool", cardPool);
+        for (let k in data) {
+            let c = data[k];
+            let name = c['name']
+            let tier = c['tier']
+            let typeName = c['typeName']
+            // let fullname = tier + '_' + typeName + '_' + name;
+            let fullname = k;
+            let filename = fullname + '.png';
+            let desc = c.desc;
+            let pos = c.pos;
+
+            // let div = document.createElement('div');
+            let div = document.createElement('div');
+            // $(div).addClass('d-inline-block')
+            // let img = document.createElement('div')
+            div.className = "mycard";
+            // img.className = "mycard"
+            // img.id = fullname
+            // $(div).draggable();
+            // MyDrag.apply(div);
+            // img.src = './img_150/' + filename;
+            div.style = `background: url(cards_150${lang == "zh" ? '_cn' : ''}.png) -${pos[0]}px -${pos[1]}px;`
+            // div.appendChild(img);
+            // div.innerHTML += `
+            //     <input class="d-none" style="width:100px;margin:0 25px;text-align:center">
+            // `;
+            // cardContainers[tier - 1].appendChild(div);
+
+            let card = {
+                name: name,
+                // id: c.id,
+                tier: tier,
+                desc: desc,
+                type: typeName,
+                filename: filename,
+                fullname: fullname,
+                element: div,
+                inPool: true,
+                shown: true,
+                rank: 0
+            }
+            cards.push(card)
+            if (tiersCount[tier])
+                tiersCount[tier]++;
+            else
+                tiersCount[tier] = 1
+
+            if (typeName == 'All') {
+                for (let k in typesCount) {
+                    typesCount[k]++;
+                }
+            } else {
+                typesCount[typeName]++;
+                typesCount['All']++;
+            }
+            for (let k in keywords) {
+                if (hasKey(card, k)) {
+                    if (keysCount[k])
+                        keysCount[k]++;
+                    else
+                        keysCount[k] = 1
+                }
+            }
+            // console.log(name, tier, typeName)
+        }
+
+        console.log("typesCount", typesCount);
+        getStrategy();
+    })
 })

@@ -1,4 +1,4 @@
-# [HearthStone Battlegrounds Card Picker (炉石传说酒馆战棋选牌器)](http://www.chixu.info/p/hsbg/)
+# [HearthStone V18.4 Battlegrounds Card Picker(炉石传说酒馆战棋选牌器)](http://www.chixu.info/p/hsbg/)
 
 HearthStone Battlegrounds Card Picker helps you to make better decision for card picking during HearthStone Battlegrounds
 ![Screenshot](docs/hsbgss0.jpg)
@@ -36,3 +36,11 @@ HearthStone Battlegrounds Card Picker helps you to make better decision for card
 &nbsp;&nbsp;&nbsp;**Notice**: The example given and data is from Version `17.2`
 
 &nbsp;&nbsp;&nbsp;[Reference: https://hearthstone.gamepedia.com/Battlegrounds](https://hearthstone.gamepedia.com/Battlegrounds)
+
+## Steps
+- get [data.json](https://playhearthstone.com/en-us/battlegrounds?type=hero%2Cminion&tier=1%2C2%2C3%2C4%2C5%2C6&viewMode=grid&collectible=0%2C1)
+- get [data_cn.json](https://hs.blizzard.cn/cards/battlegrounds?type=minion&tier=1%2C2%2C3%2C4%2C5%2C6&viewMode=grid&collectible=0%2C1)
+- py main.py
+- py minionpool.py
+
+

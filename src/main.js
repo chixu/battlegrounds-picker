@@ -6,16 +6,7 @@ let buttonTiers = [];
 let tiersCount = {};
 let keysCount = {};
 let strategies = {};
-let typesCount = {
-    'All': 0,
-    'Normal': 0,
-    'Demon': 0,
-    'Beast': 0,
-    'Dragon': 0,
-    'Mech': 0,
-    'Murloc': 0,
-    'Pirate': 0
-};
+let typesCount = {};
 const cardPool = {
 
 }
@@ -28,6 +19,7 @@ let i18n = {
     strategy: ["Strategy", "策略"],
     'Normal': ["Normal", "普通"],
     'Neutral': ["Neutral", "中立"],
+    'Elemental': ["Elemental", "元素"],
     'Common': ["Common", "通用"],
     'Demon': ["Demon", "恶魔"],
     'Beast': ["Beast", "野兽"],
@@ -119,6 +111,7 @@ let types = [
     ['17', 'Mech'],
     ['14', 'Murloc'],
     ['23', 'Pirate'],
+    ['18', 'Elemental'],
     // '100': '>100'
 ]
 let keywords = {
@@ -130,6 +123,7 @@ let keywords = {
     'Murloc': true,
     'Demon': true,
     'Pirate': true,
+    'Elemental': true,
     'Deathrattle': false,
     'Battlecry': false,
     'Divine Shield': false,
@@ -173,6 +167,108 @@ function trackEvent(eventName, props) {
         appInsights.trackEvent(eventName, props);
 }
 
+
+function calcCardCount() {
+    tiersCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    typesCount = {};
+    for (let i = 0; i < types.length; i++)
+        typesCount[types[i][1]] = 0;
+    keysCount = {}
+    for (let i = 0; i < cards.length; i++) {
+        let card = cards[i];
+        if (card.inPool) {
+            let tier = card.tier;
+            let typeName = card.type;
+            if (tiersCount[tier])
+                tiersCount[tier]++;
+            else
+                tiersCount[tier] = 1
+
+            if (typeName == 'All') {
+                for (let k in typesCount) {
+                    typesCount[k]++;
+                }
+            } else {
+                typesCount[typeName]++;
+                typesCount['All']++;
+            }
+            for (let k in keywords) {
+                if (hasKey(card, k)) {
+                    if (keysCount[k])
+                        keysCount[k]++;
+                    else
+                        keysCount[k] = 1
+                }
+            }
+        }
+    }
+    console.log("tiersCount", tiersCount);
+    console.log("typesCount", typesCount);
+    console.log("keysCount", keysCount);
+}
+
+function renderHeaderTxt() {
+    //type
+    for (let k in types) {
+        console.log(k);
+        let typename = types[k][1];
+        let txt = translate(typename) + (typesCount[typename] ? ('(' + typesCount[typename] + ')') : '')
+        let txtid = "type-txt-" + typename;
+        let ele = document.getElementById(txtid);
+        ele.innerHTML = txt;
+    }
+    for (let i = 0; i <= 6; i++) {
+        let index = i > 0 ? ('' + i) : 'All';
+        let txtid = "tier-txt-" + index;
+        let name = i > 0 ? ('T' + i + '(' + tiersCount[i] + ')') : 'All'
+        let ele = document.getElementById(txtid);
+        ele.innerHTML = name;
+    }
+    // for (let k in types) {
+    //     let typename = types[k][1];
+    //     let count = typesCount['All'];
+    //     if (typename !== "All") {
+    //         count = cardPool[typename].ids.length;
+    //     }
+    //     console.log(typename, count);
+    //     let txt = translate(typename) + '(' + count + ')';
+    //     let txtid = "pool-txt-" + typename;
+    //     let ele = document.getElementById(txtid);
+    //     ele.innerHTML = txt;
+    // }
+    for (let k in keywords) {
+        let txt = translate(k) + (keysCount[k] ? ('(' + keysCount[k] + ')') : '')
+        let txtid = "keyword-txt-" + k;
+        let ele = document.getElementById(txtid);
+        ele.innerHTML = txt;
+    }
+
+    for (let i = 0; i < 6; i++) {
+        let totalCard = 0;
+        for (let j = 1; j <= i + 1; j++) {
+            totalCard += teirInfo[j].eachCardsCount * tiersCount[j];
+        }
+        console.log("totalCard", totalCard);
+        // let name = i > 0 ? ('T' + i + '(' + tiersCount[i] + ')') : 'All'
+        let lv1Prob = 0;
+        for (let j = 1; j <= i + 1; j++) {
+            let tierCount = teirInfo[j].eachCardsCount * tiersCount[j];
+            let prob = teirInfo[i + 1].cardsChosen * tierCount / totalCard * 100;
+            let probTxt = `${(prob / tiersCount[j]).toFixed(1)}%`;
+            if (j == 1)
+                lv1Prob = probTxt
+            document.getElementById(`tier-header-${i + 1}-${j}`).innerHTML = ` T${j} ${probTxt}`;
+        }
+        let tooltip = "";
+        if (lang == "zh")
+            tooltip = `当鲍勃酒馆${i + 1}级时，找到特定一张1级卡的几率是${lv1Prob}...`
+        else
+            tooltip = `When Bob's Tavern is T${i + 1}, ${lv1Prob} chance to get a specific T1 card ...`
+        document.getElementById(`tier-header-tooltip-${i + 1}`).innerHTML = tooltip;
+
+    }
+}
+
 function renderHeader() {
     console.log(typesCount)
     for (let k in types) {
@@ -180,28 +276,31 @@ function renderHeader() {
         let typename = types[k][1];
         let txt = translate(typename) + (typesCount[typename] ? ('(' + typesCount[typename] + ')') : '')
         let id = "type-" + typename;
+        let txtid = "type-txt-" + typename;
         // header2.innerHTML += `
         // <button type="button" class="btn btn-primary" onclick="onTypeClick('${types[k]}')">${txt}</button>
         // `;
         header2.innerHTML += `
         <label id="${id}" class="filter">
             <input class="with-gap" name="typegroup" ${typename == "All" ? "checked" : ""} value="${typename}" type="radio" onchange="onTypeChange()" />
-            <span >${txt}</span>
+            <span id="${txtid}">${txt}</span>
         </label>
         `;
     }
     checkMinionType(document.getElementById('type-All'));
 
     for (let i = 0; i <= 6; i++) {
+        let index = i > 0 ? ('' + i) : 'All';
         let name = i > 0 ? ('T' + i + '(' + tiersCount[i] + ')') : 'All'
 
         // header.innerHTML += `
         // <button type="button" class="btn btn-primary" onclick="onTierClick(this,${i})">${name}</button>
         // `
+        let txtid = "tier-txt-" + index;
         header.innerHTML += `
         <label id="tier-${i}" class="filter filter-checked">
             <input type="checkbox" id="tier${i}" class="filled-in checkbox-blue" checked="checked" onchange="onTierChange(${i})"/>
-            <span class="tier-text">${name}</span>
+            <span id="${txtid}" class="tier-text">${name}</span>
         </label>
         `
     }
@@ -211,16 +310,16 @@ function renderHeader() {
         console.log(k);
         let typename = types[k][1];
         let count = typesCount['All'];
-        console.log(typename);
         if (typename !== "All") {
             count = cardPool[typename].ids.length;
         }
         let txt = translate(typename) + '(' + count + ')';
         let id = "pool-" + typename;
+        let txtid = "pool-txt-" + typename;
         headerCardpool.innerHTML += `
         <label id="${id}" class="filter">
             <input class="filled-in checkbox-blue" type="checkbox" checked value="${typename}" onchange="onPoolChange()" />
-            <span >${txt}</span>
+            <span id="${txtid}">${txt}</span>
         </label>
         `;
     }
@@ -231,13 +330,14 @@ function renderHeader() {
     for (let k in keywords) {
         let txt = translate(k) + (keysCount[k] ? ('(' + keysCount[k] + ')') : '')
         let id = "keyword-" + k;
+        let txtid = "keyword-txt-" + k;
         // header3.innerHTML += `
         // <button type="button" class="btn btn-primary" onclick="onKeywordClick('${k}')">${txt}</button>
         // `;
         header3.innerHTML += `
         <label id="${id}" class="filter">
             <input class="with-gap blue" name="keywordgroup" value="${k}" ${k == "All" ? "checked" : ""} type="radio" onchange="onKeywordChange()" />
-            <span>${txt}</span>
+            <span id="${txtid}">${txt}</span>
         </label>
         `;
 
@@ -279,7 +379,7 @@ function renderHeader() {
             if (j == 1)
                 lv1Prob = `${(prob / tiersCount[j]).toFixed(1)}%`;
             // txt += `<div class="tier-header-2"> T${j} ${(prob / tiersCount[j]).toFixed(1)}%-${prob.toFixed(1)}% </div>`
-            txt += `<div class="tier-header-2"> T${j} ${(prob / tiersCount[j]).toFixed(1)}%</div>`
+            txt += `<div id="tier-header-${i + 1}-${j}" class="tier-header-2"> T${j} ${(prob / tiersCount[j]).toFixed(1)}%</div>`
         }
         let tooltip = "";
         if (lang == "zh")
@@ -288,7 +388,7 @@ function renderHeader() {
             tooltip = `When Bob's Tavern is T${i + 1}, ${lv1Prob} chance to get a specific T1 card ...`
         txt += `
             <div class="tooltip">?
-                <span class="tooltiptext">${tooltip}</span>
+                <span id="tier-header-tooltip-${i + 1}" class="tooltiptext">${tooltip}</span>
             </div>
         `;
         tierHeader.innerHTML += txt;
@@ -343,6 +443,8 @@ function onPoolChange() {
         }
     }
     updateCardsByPool();
+    calcCardCount();
+    renderHeaderTxt();
     trackEvent("Pool", { name: t });
 }
 
@@ -400,7 +502,7 @@ function onTypeChange() {
 
 function showCard(card) {
     // console.log("showCard", card, show, important)
-    show = card.inPool && card.shown;
+    let show = card.inPool && card.shown;
     if (show) {
         $(card.element).removeClass('d-none');
         $(card.element).addClass('d-inline-block');
@@ -541,7 +643,7 @@ function onStrategyChange() {
         for (let k in cards) {
             let card = cards[k];
             let name = card.fullname;
-            card.rank = rank[name] || 0;
+            card.rank = rank[name] || -1;
             card.shown = card.rank > -1
             showCard(card);
             // $(card.element).css('display', card.rank > -1 ? 'inline-block' : 'none');
@@ -655,30 +757,30 @@ $.getJSON(`cards_150${lang == "zh" ? '_cn' : ''}.json?v=${window.___publishtime}
                 rank: 0
             }
             cards.push(card)
-            if (tiersCount[tier])
-                tiersCount[tier]++;
-            else
-                tiersCount[tier] = 1
+            // if (tiersCount[tier])
+            //     tiersCount[tier]++;
+            // else
+            //     tiersCount[tier] = 1
 
-            if (typeName == 'All') {
-                for (let k in typesCount) {
-                    typesCount[k]++;
-                }
-            } else {
-                typesCount[typeName]++;
-                typesCount['All']++;
-            }
-            for (let k in keywords) {
-                if (hasKey(card, k)) {
-                    if (keysCount[k])
-                        keysCount[k]++;
-                    else
-                        keysCount[k] = 1
-                }
-            }
+            // if (typeName == 'All') {
+            //     for (let k in typesCount) {
+            //         typesCount[k]++;
+            //     }
+            // } else {
+            //     typesCount[typeName]++;
+            //     typesCount['All']++;
+            // }
+            // for (let k in keywords) {
+            //     if (hasKey(card, k)) {
+            //         if (keysCount[k])
+            //             keysCount[k]++;
+            //         else
+            //             keysCount[k] = 1
+            //     }
+            // }
             // console.log(name, tier, typeName)
         }
-
+        calcCardCount();
         console.log("typesCount", typesCount);
         getStrategy();
     })

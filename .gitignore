@@ -3,5 +3,5 @@ dist
 python/*
 src/back/
 !python/data.json
-!python/data_cn.py
+!python/data_cn.json
 !python/main.py

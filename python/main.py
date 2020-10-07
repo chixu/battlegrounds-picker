@@ -46,6 +46,7 @@ types = {
     '20': 'Beast',
     '17': 'Mech',
     '14': 'Murloc',
+    '18': 'Elemental',
     '24': 'Dragon',
     '23': 'Pirate',
     '26': 'All'

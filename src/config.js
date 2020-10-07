@@ -7,15 +7,6 @@ let strategies = {};
 let currentStrategy = "";
 let createMode = false;
 
-let types = {
-    '26': 'All',
-    '0': 'Normal',
-    '15': 'Demon',
-    '20': 'Beast',
-    '17': 'Mech',
-    '14': 'Murloc',
-    '100': '>100'
-}
 
 let main = document.getElementById('main')
 let strategyList = document.getElementById('strategies')
@@ -33,10 +24,16 @@ for (let i = 0; i < 6; i++) {
     cardContainers.push(dragContainer);
     container.appendChild(dragContainer.element);
     // container.innerHTML += 
-    let button = $(`
-    <button type="button" class="btn btn-primary mt-2 ml-3" onclick="onTierResetClick(${i})">Reset</button>
-    `)
-    container.appendChild(button[0]);
+    // let button = $(`
+    // <button type="button" class="btn btn-primary mt-2 ml-3" onclick="onTierResetClick(${i})">Reset</button>
+    // `)
+    // container.appendChild(button[0]);
+
+    let removedContainer = document.createElement('div');
+    removedContainer.className = "removed-container"
+    dragContainer.removedContainer = removedContainer;
+    dragContainer.$removedContainer = $(removedContainer);
+    container.appendChild(removedContainer);
     main.appendChild(container);
 }
 
@@ -52,13 +49,13 @@ function renderHeader() {
     }
 }
 
-function onTierResetClick(index) {
-    let items = cardContainers[index].items;
-    for (let i = 0; i < items.length; i++) {
-        items[i].visible = true;
-    }
-    cardContainers[index].render();
-}
+// function onTierResetClick(index) {
+//     let items = cardContainers[index].items;
+//     for (let i = 0; i < items.length; i++) {
+//         items[i].visible = true;
+//     }
+//     cardContainers[index].render();
+// }
 
 function onStrategyClick(key) {
     if (key == undefined || key == currentStrategy) return;
@@ -133,6 +130,17 @@ function onDeleteCardClick(name) {
     getCardByName2(name).dragItem.container.render();
 }
 
+function onAddCardMouse() {
+    event.stopPropagation();
+}
+
+function onAddCardClick(name) {
+    event.stopPropagation();
+    console.log(event, name);
+    getCardByName2(name).dragItem.visible = true;
+    getCardByName2(name).dragItem.container.render();
+}
+
 function onDeleteClick() {
     if (confirm(`Are you sure you want to delete "${currentStrategy}"?`)) {
         // Save it!
@@ -192,7 +200,7 @@ function showStrategy(name) {
         let rank = strategies[name];
         for (let k in cards) {
             let name = cards[k].fullname;
-            cards[k].rank = rank[name] || 0;
+            cards[k].rank = rank[name] || -1;
             // if (cards[k].rank == -1)
             cards[k].dragItem.visible = cards[k].rank > -1;
         }
@@ -272,13 +280,17 @@ $.getJSON('cards_150.json', function (data) {
         // img.style = 'display:block'
 
         img.className = "d-inline-block mycard";
-        img.style = `display:block; background: url(cards_150.png) -${pos[0]}px -${pos[1]}px;`
+        img.style = `background: url(cards_150.png) -${pos[0]}px -${pos[1]}px;`
         div.appendChild(img);
         div.innerHTML += `
             <button type="button" class="btn btn-danger" 
             onpointerdown="onDeleteCardMouse()"
             onmousedown="onDeleteCardMouse()"
             onclick="onDeleteCardClick('${getCardFullName2(fullname)}')">X</button>
+            <button type="button" class="btn btn-success" 
+            onpointerdown="onAddCardMouse()"
+            onmousedown="onAddCardMouse()"
+            onclick="onAddCardClick('${getCardFullName2(fullname)}')">+</button>
         `;
         // cardContainers[tier - 1].appendChild(div);
 

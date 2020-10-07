@@ -1,6 +1,6 @@
 // var MyDrag = {};
-var itemHeight = 207;
-var itemWidth = 150;
+var itemHeight = 179;
+var itemWidth = 130;
 var itemXMargin = -3;
 var itemYMargin = 0;
 var itemZIndex = 1000;
@@ -63,6 +63,8 @@ DragContainer.prototype.getVisibleItems = function () {
 
 DragContainer.prototype.render = function (item) {
     let items = this.getVisibleItems();
+    console.log("render");
+    // let items = this.items;
     let count = items.length;
     // console.log('$element.outerWidth()', this.$element.outerWidth())
     console.log('window.innerWidth', window.innerWidth)
@@ -79,10 +81,14 @@ DragContainer.prototype.render = function (item) {
     for (let i = 0; i < this.items.length; i++) {
         let item = this.items[i];
         // console.log(item.visible, item.$element)
-        if (item.visible)
-            item.$element.removeClass('d-none');
-        else
-            item.$element.addClass('d-none');
+        if (item.visible) {
+            // this.$element.appendChild(item.$element);
+            item.$element.removeClass('card-hide');
+        } else {
+            // console.log(this.$removedContainer);
+            this.$removedContainer.append(item.$element)
+            item.$element.addClass('card-hide');
+        }
     }
 
     for (let i = 0; i < items.length; i++) {
@@ -94,7 +100,8 @@ DragContainer.prototype.render = function (item) {
         //     y: r * (itemYMargin + itemHeight),
         // });
         // console.log(items[i].card.fullname, i, r, c);
-        this.$element.append(this.items[i].$element);
+        console.log(r, c, i);
+        this.$element.append(items[i].$element);
         items[i].index = i;
         items[i].setPosition(r, c)
     }
@@ -129,7 +136,7 @@ var dc2 = DragContainer.sayHi();
 
 function DragItem(index) {
     this.container;
-    this.visible = true;
+    this._visible = true;
     this.index = index;
     this.isDragging = false;
     this.positioned = true;
@@ -139,8 +146,8 @@ function DragItem(index) {
     var element = $("<div></div>");
     this.$element = element;
     this.$element.css('width', itemWidth + 'px')
-    $(element).css("position", "absolute")
-    $(element).css("display", "block")
+    // $(element).css("position", "absolute")
+    // $(element).css("display", "block")
     var threshold = "40%";
     var _this = this;
     // var lastX = 0;
@@ -244,6 +251,26 @@ function DragItem(index) {
     }
     this.element = element[0];
 }
+
+
+Object.defineProperty(DragItem.prototype, "visible", {
+    set(v) {
+        if (v) {
+            this.draggable[0].enable();
+        } else {
+            console.log("visible", v, this.$element);
+            this.draggable[0].disable();
+            this.$element.css('transform', '')
+            this.row = -1;
+            this.col = -1;
+        }
+        this._visible = v;
+    },
+    get() {
+        return this._visible;
+    }
+})
+
 
 DragItem.prototype.setPosition = function (r, c, forced = false) {
     if ((this.row != r || this.col != c) && !this.isDragging && this.positioned) {
